@@ -754,7 +754,7 @@
 
         var zoom = false;
         if (self.opt.boxzoom&&!self.ispage&&!cap.isieold) {
-          zoom = self.opt.zoomElementId ? document.getElementById('zoozoo') : document.createElement('div');
+          zoom = self.opt.zoomElementId ? document.getElementById(this.opt.zoomElementId) : document.createElement('div');
           self.bind(zoom,"click",self.doZoom);
           self.zoom = $(zoom);
           if(!self.opt.zoomElementId){
@@ -852,12 +852,12 @@
 
             rail.css({position:rlpos});
             if(!self.opt.zoomElementId){
-              if (self.zoom) self.zoom.css({position:rlpos});
+              if (self.zoom && !self.opt.zoomElementId) self.zoom.css({position:rlpos});
             }
             
             self.updateScrollBar();
             self.body.append(rail);
-            if (self.zoom) self.body.append(self.zoom);
+            if (self.zoom && !self.opt.zoomElementId) self.body.append(self.zoom);
             if (self.railh) {
               railh.css({position:rlpos});
               self.body.append(railh);
@@ -1761,7 +1761,7 @@
         self.cursoractive = true;
       }
 
-      if (self.zoom) self.zoom.stop().css({opacity:self.opt.cursoropacitymax});
+      if (self.zoom && !self.opt.zoomElementId) self.zoom.stop().css({opacity:self.opt.cursoropacitymax});
     };
 
     this.hideCursor = function(tm) {
@@ -1771,7 +1771,7 @@
       self.cursortimeout = setTimeout(function() {
          if (!self.rail.active||!self.showonmouseevent) {
            self.autohidedom.stop().animate({opacity:self.opt.cursoropacitymin});
-           if (self.zoom) self.zoom.stop().animate({opacity:self.opt.cursoropacitymin});
+           if (self.zoom && !self.opt.zoomElementId) self.zoom.stop().animate({opacity:self.opt.cursoropacitymin});
            self.cursoractive = false;
          }
          self.cursortimeout = 0;
@@ -2040,6 +2040,10 @@
 
     // Thanks to http://www.switchonthecode.com !!
     this.cancelEvent = function(e) {
+      if (e === null || e === undefined) {
+        return false;
+      }
+      
       var e = (e.original) ? e.original : (e) ? e : window.event||false;
       if (!e) return false;
       if(e.preventDefault) e.preventDefault();
